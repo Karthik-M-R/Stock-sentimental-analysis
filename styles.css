@@ -1,0 +1,38 @@
+.dark,
+body.dark {
+    background-color: #0f172a !important;
+    color: #f1f5f9;
+}
+
+.sentiment-positive {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.sentiment-negative {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.sentiment-neutral {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+}
+
+.chart-bar {
+    transition: width 0.5s ease-out;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+/*overflow: hidden; → Hides text that doesn’t fit.
+
+display: -webkit-box; → Special display mode for flexible text layout.
+
+-webkit-box-orient: vertical; → Sets direction = vertical (like block).
+
+-webkit-line-clamp: 2; → Restrict text to 2 lines only.
+
+line-clamp: 2; → (future standard) same thing as above.*/

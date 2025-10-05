@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Stock Sentiment Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 transition-colors duration-300">
+    <div class="min-h-screen p-4 md:p-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-green-500">
+                        📈 Stock Sentiment Dashboard
+                    </h1>
+                    <p class="text-gray-600 dark:text-blue-590 mt-2">Analyze Indian stock news sentiment in real-time</p>
+                </div>
+                <button id="darkModeToggle" class="p-3 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <span class="dark:hidden">🌙</span>
+                    <span class="hidden dark:inline">☀️</span>
+                </button>
+            </div>
+
+            <!-- Search Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stock Symbol</label>
+                        <input 
+                            type="text" 
+                            id="stockInput" 
+                            placeholder="e.g., TCS, RELIANCE, INFY, HDFC"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                    </div>
+                    <div class="flex items-end">
+                        <button 
+                            id="analyzeBtn"
+                            class="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg"
+                        >
+                            Analyze Sentiment
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                    Enter an Indian stock symbol to analyze news sentiment
+                </p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="hidden text-center py-12">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Fetching news articles...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="hidden">
+                <!-- Sentiment Overview -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Overall Sentiment Analysis</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border-2 border-green-200 dark:border-green-800">
+                            <div class="text-green-600 dark:text-green-400 text-sm font-semibold mb-1">POSITIVE</div>
+                            <div class="text-3xl font-bold text-green-700 dark:text-green-300" id="positivePercent">0%</div>
+                            <div class="text-sm text-green-600 dark:text-green-400 mt-1" id="positiveCount">0 articles</div>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border-2 border-gray-200 dark:border-gray-600">
+                            <div class="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-1">NEUTRAL</div>
+                            <div class="text-3xl font-bold text-gray-700 dark:text-gray-300" id="neutralPercent">0%</div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1" id="neutralCount">0 articles</div>
+                        </div>
+                        
+                        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border-2 border-red-200 dark:border-red-800">
+                            <div class="text-red-600 dark:text-red-400 text-sm font-semibold mb-1">NEGATIVE</div>
+                            <div class="text-3xl font-bold text-red-700 dark:text-red-300" id="negativePercent">0%</div>
+                            <div class="text-sm text-red-600 dark:text-red-400 mt-1" id="negativeCount">0 articles</div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Chart -->
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Positive</span>
+                                <span class="font-semibold text-green-600 dark:text-green-400" id="posChartPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div id="posBar" class="sentiment-positive h-3 rounded-full chart-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Neutral</span>
+                                <span class="font-semibold text-gray-600 dark:text-gray-400" id="neuChartPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div id="neuBar" class="sentiment-neutral h-3 rounded-full chart-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Negative</span>
+                                <span class="font-semibold text-red-600 dark:text-red-400" id="negChartPercent">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                                <div id="negBar" class="sentiment-negative h-3 rounded-full chart-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Articles -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">News Articles</h2>
+                    <div id="newsContainer" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error" class="hidden bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
+                <p class="text-red-700 dark:text-red-400" id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+    <footer class="text-center text-sm text-gray-500 dark:text-gray-400 mb-8">
+        Made with ❤️ by Karthik MR for personal Stock Analysis..
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
